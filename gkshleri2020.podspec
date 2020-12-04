@@ -24,6 +24,9 @@ This CocoaPods library helps you perform calculation.
   spec.swift_version = "4.2"
 
   spec.source        = { :git => "https://github.com/IvanLevin/gkshleri2020.git", :tag => "#{spec.version}" }
-  spec.source_files  = "gkshleri2020/**/*.{h,m,swift}"
+  spec.source_files = 'gkshleri2020/Classes/*.swift'
+  spec.resources = 'gkshleri2020/Classes/*.xcdatamodeld'
+
+  spec.frameworks = 'UIKit', 'MapKit', 'CoreData'
 
 end

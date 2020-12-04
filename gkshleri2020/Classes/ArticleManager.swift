@@ -1,85 +1,162 @@
 //
 //  ArticleManager.swift
-//  vgladush2018
+//  Pods
 //
-//  Created by Vyacheslav GLADUSH on 12.10.2018.
+//  Created by Jimmy CHEN-MA on 10/11/18.
 //
 
+import Foundation
 import CoreData
 
-public class ArticleManager: NSObject {
+@available(iOS 10.0, *)
+public class ArticleManager
+{
+    let context:NSManagedObjectContext
     
-    var managedObjectContext : NSManagedObjectContext
-    var commitPredicate: NSPredicate?
-    let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Article")
-    
-    public override init() {
-        let myBundle = Bundle(identifier: "org.cocoapods.vgladush2018")
-        guard let modelURL = myBundle?.url(forResource: "article", withExtension:"momd") else {
-            fatalError("Error loading model from bundle")
-        }
-        
-        // The managed object model for the application. It is a fatal error for the application not to be able to find and load its model.
-        guard let mom = NSManagedObjectModel(contentsOf: modelURL) else {
-            fatalError("Error initializing mom from: \(modelURL)")
-        }
-        
-        let psc = NSPersistentStoreCoordinator(managedObjectModel: mom)
-        
-        managedObjectContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.mainQueueConcurrencyType)
-        managedObjectContext.persistentStoreCoordinator = psc
-        
-        let docURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last
-        let storeURL = docURL?.appendingPathComponent("vgladush2018.sqlite")
-        do {
-            try psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
-        } catch {
-            fatalError("Error migrating store: \(error)")
-        }
+    public func newArticle(title:String, content:String, language:String, image:NSData?) -> Article
+    {
+        //Create a new article
+        let doc = Date()
+        let dom = Date()
+        let art = Article(context: context)
+        art.setValue(title, forKey: "title")
+        art.setValue(content, forKey: "content")
+        art.setValue(language, forKey: "language")
+        art.setValue(doc, forKey: "dateOfCreation")
+        art.setValue(dom, forKey: "dateOfModification")
+        art.setValue(image, forKey: "image")
+        return art
     }
     
-    public func newArticle () -> Article {
-        return NSEntityDescription.insertNewObject(forEntityName: "Article", into: managedObjectContext) as! Article
-    }
-    
-    func loadData() -> [Article] {
-        request.predicate = commitPredicate
-        do {
-            let result = try managedObjectContext.fetch(request) as! [Article]
-            return result
-        }catch{
-            fatalError("Failed to fetch arts")
-        }
-        commitPredicate = nil
-    }
-    
-    public func getAllArticles() -> [Article] {
-        commitPredicate = NSPredicate(value: true)
-        return loadData()
-    }
-    
-    public func  getArticles(withLang lang : String) -> [Article] {
-        commitPredicate = NSPredicate(format: "language == %@", lang)
-        return loadData()
-    }
-    
-    public func getArticles(containString str : String) -> [Article] {
-        commitPredicate = NSPredicate(format: "title CONTAINS %@ || content CONTAINS %@", str, str)
-        return loadData()
-    }
-    
-    public func removeArticle(article : Article) {
-        managedObjectContext.delete(article)
-    }
-    
-    public func save() {
-        if managedObjectContext.hasChanges {
-            do {
-                try managedObjectContext.save()
-            }
-            catch{
-                fatalError("Fail to save content \(error)");
+    public func getAllArticles() -> [Article]
+    {
+        //return all the articles
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Article")
+        fetchRequest.returnsObjectsAsFaults = false
+        do
+        {
+            if let results = try context.fetch(fetchRequest) as? [Article]
+            {
+                return results
             }
         }
+        catch
+        {
+            print ("There was a fetch error!")
+        }
+        return []
+    }
+    
+    public func getArticles(withLang lang : String) -> [Article]
+    {
+        //return all the articles with the language selected
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Article")
+        fetchRequest.returnsObjectsAsFaults = false
+        var arrayArticle:[Article] = []
+        
+        do
+        {
+            if let results = try context.fetch(fetchRequest) as? [Article]
+            {
+                for res in results
+                {
+                    if let r = res.language
+                    {
+                        if (r == lang)
+                        {
+                            arrayArticle.append(res)
+                        }
+                    }
+                }
+                return arrayArticle
+            }
+        }
+        catch
+        {
+            print ("There was a fetch error!")
+        }
+        return []
+    }
+    
+    public func getArticles(containString str : String) -> [Article]
+    {
+        //return all the articles with the string selected
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Article")
+        fetchRequest.returnsObjectsAsFaults = false
+        var arrayArticle:[Article] = []
+        var appended:Bool = false
+        
+        
+        do
+        {
+            if let results = try context.fetch(fetchRequest) as? [Article]
+            {
+                let tmpstr = str.lowercased()
+                for res in results
+                {
+                    appended = false
+                    if let title = res.title
+                    {
+                        if title.lowercased().range(of:tmpstr) != nil
+                        {
+                            arrayArticle.append(res)
+                            appended = true
+                        }
+                    }
+                    if let content = res.content
+                    {
+                        if content.lowercased().range(of: tmpstr) != nil && appended == false
+                        {
+                            arrayArticle.append(res)
+                        }
+                    }
+                }
+                return arrayArticle
+            }
+        }
+        catch
+        {
+            print ("There was a fetch error!")
+        }
+        return []
+    }
+    
+    public func removeArticle(article : Article)
+    {
+        //remove article selected
+        context.delete(article)
+    }
+    
+    public func save()
+    {
+        //save all modifications
+        do {
+            try context.save()
+        } catch let error as NSError {
+            print("Could not save. \(error)")
+        }
+    }
+    
+    public init()
+    {
+        let myBundle = Bundle(for:Article.self)
+        
+        // Initialize NSManagedObjectModel
+        let modelURL = myBundle.url(forResource: "article", withExtension: "momd")
+        guard let model = NSManagedObjectModel(contentsOf: modelURL!) else { fatalError("model not found") }
+        
+        // Configure NSPersistentStoreCoordinator with an NSPersistentStore
+        let psc = NSPersistentStoreCoordinator(managedObjectModel: model)
+        
+        let storeURL = try! FileManager
+            .default
+            .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            .appendingPathComponent("article.sqlite")
+        
+        try! psc.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
+        
+        // Create and return NSManagedObjectContext
+        context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        context.persistentStoreCoordinator = psc
     }
 }
