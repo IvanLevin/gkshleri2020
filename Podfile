@@ -13,6 +13,6 @@ target 'gkshleri2020' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for gkshleri2020
+  pod 'gkshleri2020', :git => 'https://github.com/IvanLevin/gkshleri2020.git'
 
 end

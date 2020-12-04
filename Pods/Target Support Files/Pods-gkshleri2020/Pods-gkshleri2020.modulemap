@@ -1,6 +1,0 @@
-framework module Pods_gkshleri2020 {
-  umbrella header "Pods-gkshleri2020-umbrella.h"
-
-  export *
-  module * { export * }
-}

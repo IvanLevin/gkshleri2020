@@ -18,12 +18,12 @@ This CocoaPods library helps you perform calculation.
 
   spec.homepage     = "https://github.com/IvanLevin/gkshleri2020.git"
   spec.license      = { :type => "MIT", :file => "LICENSE" }
-  spec.author       = { "jeantimex" => "levvanya@gmail.com" }
+  spec.author       = { "gkshleri" => "levvanya@gmail.com" }
 
   spec.ios.deployment_target = "12.1"
   spec.swift_version = "4.2"
 
-  spec.source        = { :git => "https://github.com/IvanLevin/gkshleri2020.git", :tag => "#{spec.version}" }
+  spec.source        = { :git => "https://github.com/IvanLevin/gkshleri2020.git", :tag => "0.0.1" }
   spec.source_files = 'gkshleri2020/Classes/*.swift'
   spec.resources = 'gkshleri2020/Classes/*.xcdatamodeld'
 
