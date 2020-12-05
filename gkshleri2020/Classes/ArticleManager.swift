@@ -11,7 +11,7 @@ import CoreData
 
 @available(iOS 10.0, *)
 public class ArticleManager {
-    private static enum Values {
+    private enum Values {
         static let title = "title"
         static let content = "content"
         static let language = "language"
@@ -28,7 +28,7 @@ public class ArticleManager {
         let dom = Date()
         let art = Article(context: context)
         art.setValue(title, forKey: ArticleManager.Values.title)
-        art.setValue(content, forKey: ArticleManager.Values.context)
+        art.setValue(content, forKey: ArticleManager.Values.content)
         art.setValue(language, forKey: ArticleManager.Values.language)
         art.setValue(doc, forKey: ArticleManager.Values.dateOfCreation)
         art.setValue(dom, forKey: ArticleManager.Values.dateOfModification)
