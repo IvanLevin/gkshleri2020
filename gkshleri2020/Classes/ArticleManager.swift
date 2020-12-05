@@ -115,6 +115,28 @@ public class ArticleManager {
         }
     }
     
+    public func editArticle(article:Article, title:String, content:String, image:NSData?) {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Article")
+        fetchRequest.returnsObjectsAsFaults = false
+        do {
+            if let results = try context.fetch(fetchRequest) as? [Article] {
+                for res in results {
+                    if res == article {
+                        res.title = title
+                        res.content = content
+                        if let i = image {
+                            res.image = i
+                        }
+                        res.dateOfModification = Date() as NSDate
+                        break
+                    }
+                }
+            }
+        } catch {
+            print ("There was a fetch error!")
+        }
+    }
+    
     public init() {
         let myBundle = Bundle(for:Article.self)
         
