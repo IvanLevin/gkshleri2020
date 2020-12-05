@@ -1,8 +1,8 @@
 //
-//  Article+CoreDataProperties.swift
+//  Article+CoreDataClass.swift
 //  Pods
 //
-//  Created by Jimmy CHEN-MA on 10/11/18.
+//  Created by Ivan Levin on 04/12/20.
 //
 //
 
