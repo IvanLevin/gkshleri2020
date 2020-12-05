@@ -117,10 +117,12 @@ public class ArticleManager {
     
     public init() {
         let myBundle = Bundle(for:Article.self)
-        let modelURL = myBundle.url(forResource: ArticleManager.Values.article, withExtension: "momd")
+        
+        let modelURL = myBundle.url(forResource: "article", withExtension: "momd")
         guard let model = NSManagedObjectModel(contentsOf: modelURL!) else { fatalError("model not found") }
         
         let psc = NSPersistentStoreCoordinator(managedObjectModel: model)
+        
         let storeURL = try! FileManager
             .default
             .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
